@@ -1,0 +1,8 @@
+Parse_Business_Activity_Llama_Parse_Job_ID -
+
+76af7aeb-fc72-4ba3-a097-d51aa680a3d1
+
+
+API Llama_v3 - llx-FOQfv4Dvyp7ET9RtlJxBp8LyFaRHWcluqDSir4ebtG8PsvsB
+
+Open AI api - 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
