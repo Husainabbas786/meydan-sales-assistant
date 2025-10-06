@@ -65,7 +65,7 @@ def initialize_services():
     """Initialize services exactly as in chatbot.py"""
     print("Initializing Meydan Free Zone Sales Assistant...")
     index = LlamaCloudIndex(
-        name="business_activity_intelligence",  # EXACT name from chatbot.py
+        name="business_activity_intelligence-1759747899",  # EXACT name from chatbot.py
         project_name="Default",
         organization_id=os.getenv("LLAMA_CLOUD_ORGANIZATION_ID"),
         api_key=os.getenv("LLAMA_CLOUD_API_KEY"),
