@@ -330,7 +330,7 @@ Be precise, strategic, and consultative. Ensure recommendations maximize custome
 """
     
     # Retrieve with appropriate top_k based on persona
-    top_k = 15 if persona == "Business" else 10
+    top_k = 10 if persona == "Business" else 8
     
     retriever = index.as_retriever(similarity_top_k=top_k)
     query_engine = index.as_query_engine(llm=llm, similarity_top_k=top_k)
