@@ -214,7 +214,7 @@ def concise_summary(answer, max_words=15):
     return " ".join(words[:max_words]) + "..."
 
 def get_activity_recommendations(profile):
-    """Query index with persona-aware logic and chain-of-thought reasoning - EXACT from chatbot.py"""
+    """Query index with persona-aware logic and chain-of-thought reasoning"""
     
     persona = profile['persona']
     
@@ -242,8 +242,8 @@ RESIDENTIAL PERSONA CONTEXT:
 - Residency Plan: {profile['persona_answers'].get('residency_plan', 'N/A')}
 
 PRIORITIZATION FOR THIS PERSONA:
-Apply weights: Risk (40%) + Third-Party Approval (40%) + Correlation (20%)
-Accept 70-80% correlation if it means Low risk and N/A approval
+Apply weights: Risk (50%) + Correlation (50%)
+Accept 80%+ correlation match
 """
     elif persona == "Business":
         query_context += f"""
@@ -251,7 +251,7 @@ BUSINESS PERSONA CONTEXT:
 - Detailed Business Model: {profile['persona_answers'].get('business_model', 'N/A')}
 
 PRIORITIZATION FOR THIS PERSONA:
-Apply weights: Correlation (60%) + Risk (25%) + Third-Party Approval (15%)
+Apply weights: Correlation (85%) + Risk (15%)
 STRICT REQUIREMENT: Minimum 90% correlation with business description
 This is a genuine entrepreneur - exact activity match is critical
 """
@@ -276,50 +276,66 @@ CHAIN-OF-THOUGHT ANALYSIS REQUIRED:
 3. Search Business Activities Database for all possible matches using keywords and synonyms
 4. Apply persona-specific prioritization weights
 5. For each candidate activity, evaluate:
-   - Semantic correlation strength (90%+ for Business, 70%+ for Residential/Finance)
+   - Semantic correlation strength (90%+ for Business, 80%+ for Residential/Finance)
    - Risk rating (Low preferred, High only when necessary)
-   - Third-party approval status (N/A preferred)
    - Group optimization (fewer groups better)
-6. Consider Mike's strategic insights (avoid general trading, suggest specific alternatives, flag banking challenges)
-7. Validate final recommendations against decision matrix
+6. Consider strategic insights from MFZ Knowledge Base (avoid general trading, flag concerns, suggest specific alternatives)
+7. Consider complementary activities within 3-group package
+8. Assess banking implications (especially for Finance persona)
 
 DELIVERABLE:
-Provide exactly 3 ranked activity recommendations following the format:
+Provide preferably 2 ranked activity recommendations following the format:
 
 RECOMMENDATION 1: [Primary Recommendation]
-Activity Code: [6-digit code]
+Group: [3-digit code]
+Activity Code: [6-digit format like 1811.04]
 Activity Name: [Full name]
-Category: [Category]
-Group: [3-digit group]
-Description: [Full description from database]
-Third Party Approval: [Yes/No] [Authority if yes]
+Category: [e.g., Manufacturing, Trading, Professional]
+Full Description: [Full description from database]
+Third Party Approval: [Yes/No] [Authority name if yes, e.g., "Dubai Municipality (DM)"]
 When: [PRE/POST/N/A]
 Risk Rating: [Low/Medium/High]
 Industry Risk: [Yes/No/N/A]
-Match Explanation: [2-3 sentences explaining why this fits with persona logic applied]
+Match Explanation: [2-3 sentences explaining why this fits customer needs with persona logic applied]
 Related Activities:
   - [Code]: [Name] - [1-line description]
   - [Code]: [Name] - [1-line description]
-Expert Insights: [Strategic guidance from Activity Hubs or MFZ Knowledge Base if available]
+Expert Insights: [Include strategic guidance from Activity Hubs and MFZ Knowledge Base if available]
 
-[Repeat for RECOMMENDATION 2 and 3]
+RECOMMENDATION 2: [Secondary Recommendation]
+Group: [3-digit code]
+Activity Code: [6-digit format like 1811.04]
+Activity Name: [Full name]
+Category: [e.g., Manufacturing, Trading, Professional]
+Full Description: [Full description from database]
+Third Party Approval: [Yes/No] [Authority name if yes, e.g., "Dubai Municipality (DM)"]
+When: [PRE/POST/N/A]
+Risk Rating: [Low/Medium/High]
+Industry Risk: [Yes/No/N/A]
+Match Explanation: [2-3 sentences explaining why this fits customer needs with persona logic applied]
+Related Activities:
+  - [Code]: [Name] - [1-line description]
+  - [Code]: [Name] - [1-line description]
+Expert Insights: [Include strategic guidance from Activity Hubs and MFZ Knowledge Base if available]
+
+CRITICAL RULES:
+1. For Business persona: Never compromise on correlation - must be 90%+ match
+2. For Residential persona: Prefer N/A approvals and Low risk even if correlation is 80%+
+3. For Finance persona: Check nationality risk first - if Override, immediately respond "Cannot issue license due to country risk rating"
+4. Always suggest fewer activity groups when possible
+5. Flag general trading concerns, even other concerns and suggest specific alternatives (MFZ Business Activities Knowledge Base)
+6. Explain any approval delays or banking complications transparently
+
+Be precise, strategic, and consultative. Ensure recommendations maximize customer success while adhering to regulations.
 """
     
-    # Retrieve with appropriate top_k based on persona - EXACT from chatbot.py
+    # Retrieve with appropriate top_k based on persona
     top_k = 15 if persona == "Business" else 10
     
     retriever = index.as_retriever(similarity_top_k=top_k)
     query_engine = index.as_query_engine(llm=llm, similarity_top_k=top_k)
     
     print("\n[Applying chain-of-thought reasoning across all knowledge sources...]")
-
-    print("\n" + "="*50)
-    print("DEBUG INFO:")
-    print(f"Using model: {llm.model}")
-    print(f"Temperature: {llm.temperature}")
-    print(f"Top K: {top_k}")
-    print(f"Query context length: {len(query_context)} chars")
-    print("="*50 + "\n")
     
     response = query_engine.query(query_context)
     return response.response
