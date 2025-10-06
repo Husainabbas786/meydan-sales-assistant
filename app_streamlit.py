@@ -139,7 +139,7 @@ For each recommendation, think through:
 8. Assess banking implications (especially for Finance persona)
 
 OUTPUT REQUIREMENTS:
-Provide preferably 2 ranked activity recommendations. Note: if you find more than 2 which match the criteria then show 1 more.
+Provide preferably 2 ranked activity recommendations. 
 - Group (3-digit code)
 - Activity Code (6-digit format like 1811.04)
 - Activity Name
